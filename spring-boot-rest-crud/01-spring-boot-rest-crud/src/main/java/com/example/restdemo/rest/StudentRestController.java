@@ -1,11 +1,14 @@
 package com.example.restdemo.rest;
 
 import com.example.restdemo.entity.Student;
+import com.example.restdemo.entity.StudentErrorResponse;
+import com.example.restdemo.exception.StudentNotFoundException;
 import jakarta.annotation.PostConstruct;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.apache.catalina.loader.ResourceEntry;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +18,21 @@ import java.util.List;
 public class StudentRestController {
 
     List<Student> listOfStudent;
+
+    @ExceptionHandler
+    public ResponseEntity<StudentErrorResponse> handleException(StudentNotFoundException ex){
+        //create student error response
+
+        StudentErrorResponse studentErrorResponse = new StudentErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage(), System.currentTimeMillis());
+
+        //return response entity
+        return new ResponseEntity<>(studentErrorResponse, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler ResponseEntity<StudentErrorResponse> handleException(Exception ex){
+        StudentErrorResponse studentErrorResponse = new StudentErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage(), System.currentTimeMillis());
+        return new ResponseEntity<>(studentErrorResponse, HttpStatus.BAD_REQUEST);
+    }
 
     @PostConstruct
     private void getStudents() {
@@ -30,7 +48,9 @@ public class StudentRestController {
 
     @GetMapping("/students/{studentId}")
     public Student getStudent(@PathVariable int studentId){
-
+        if(studentId>=listOfStudent.size() || studentId<0){
+            throw new StudentNotFoundException("Student not found exception id :: "+ studentId);
+        }
         return  listOfStudent.get(studentId);
     }
 }
