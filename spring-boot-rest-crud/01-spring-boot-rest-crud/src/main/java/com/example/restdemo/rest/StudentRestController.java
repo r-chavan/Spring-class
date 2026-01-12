@@ -19,6 +19,7 @@ public class StudentRestController {
 
     List<Student> listOfStudent;
 
+    /*
     @ExceptionHandler
     public ResponseEntity<StudentErrorResponse> handleException(StudentNotFoundException ex){
         //create student error response
@@ -33,6 +34,8 @@ public class StudentRestController {
         StudentErrorResponse studentErrorResponse = new StudentErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage(), System.currentTimeMillis());
         return new ResponseEntity<>(studentErrorResponse, HttpStatus.BAD_REQUEST);
     }
+
+     */
 
     @PostConstruct
     private void getStudents() {
